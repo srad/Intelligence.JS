@@ -76,5 +76,11 @@ module.exports = {
     Node:      Node,
     FnWrapper: FnWrapper,
     ParamNode: ParamNode,
-    ConstNode: ConstNode
+    ConstNode: ConstNode,
+    random:    function (min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    },
+    pick:      function (array) {
+        return array[this.random(0, array.length - 1)];
+    }
 };

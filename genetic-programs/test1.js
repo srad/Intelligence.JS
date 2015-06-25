@@ -60,7 +60,28 @@ var addw = new core.FnWrapper({
             new core.Node({fw: addw, children: [new core.ParamNode(1), new core.ConstNode(5)]}),
             new core.Node({fw: subw, children: [new core.ParamNode(1), new core.ConstNode(2)]})
         ]
-    });
+    }),
 
-console.log(tree1.evaluate([5, 3]));
-tree1.display();
+    createRandomTree = function (pc, maxDepth, fpr, ppr) {
+        maxDepth = maxDepth === undefined ? 4 : maxDepth;
+        fpr = fpr === undefined ? 0.5 : fpr;
+        ppr = ppr === undefined ? 0.6 : ppr;
+
+        if (Math.random() < fpr && maxDepth > 0) {
+            var f = core.pick(fnList),
+                children = Array.apply(null, new Array(f.childCount))
+                    .map(function () {
+                        return createRandomTree(pc, maxDepth - 1, fpr, ppr);
+                    });
+
+            return new core.Node({fw: f, children: children});
+        } else if (Math.random() < ppr) {
+            return new core.ParamNode(core.random(0, pc - 1));
+        } else {
+            return core.ConstNode(core.random(0, 10));
+        }
+    };
+
+//console.log(tree1.evaluate([5, 3]));
+//tree1.display();
+createRandomTree(2).display();
