@@ -155,21 +155,46 @@ var addw = new core.FnWrapper({
         }
     },
 
-    unknownFunction = function (x, y) {
+    /**
+     * @param t1
+     * @param t2
+     * @param [probswap]
+     * @param [top]
+     * @returns {*}
+     */
+    crossover = function (t1, t2, probswap, top) {
+        probswap = probswap === undefined ? 0.7 : probswap;
+        top = top === undefined ? 1.0 : top;
+
+        if ((Math.random() < probswap) && (probswap !== top)) {
+            return t2.clone();
+        } else {
+            var result = t1.clone();
+            if ((t1 instanceof core.Node) && (t2 instanceof core.Node)) {
+                result.childre = t1.childre
+                    .map(function (child) {
+                        return crossover(child, core.pick(t2.children), probswap, 0);
+                    });
+            }
+            return result;
+        }
+    },
+
+    unknownFn = function (x, y) {
         return (Math.pow(x, 2) + (2 * y) + (3 * x) + 5);
     },
 
-    buildUknownFunktionValues = function () {
+    buildValueOfUnknownFn = function () {
         return Array.apply(null, new Array(200))
             .map(function () {
                 var x = core.random(0, 40),
                     y = core.random(0, 40);
 
-                return [x, y, unknownFunction(x, y)];
+                return [x, y, unknownFn(x, y)];
             });
     },
 
-    randomSet = buildUknownFunktionValues(),
+    randomSet = buildValueOfUnknownFn(),
 
     scoreFn = function (tree, s) {
         var dif = 0;
@@ -182,7 +207,8 @@ var addw = new core.FnWrapper({
         return dif;
     },
 
-    randomTree = createRandomTree(2);
+    randomTree = createRandomTree(2),
+    randomTree2 = createRandomTree(2);
 
 //console.log(tree1.evaluate([5, 3]));
 //tree1.display();
@@ -194,6 +220,12 @@ console.log(scoreFn(randomTree, randomSet));
 
 var mutated = mutate(randomTree, 2);
 
-console.log('-------------------------------------');
+console.log('\n-------------------------------------\n');
 console.log(scoreFn(randomTree, randomSet));
 console.log(scoreFn(mutated, randomSet));
+console.log('\n-----------------T1---------------------\n');
+randomTree.display();
+console.log('\n-----------------T2------------------\n');
+randomTree2.display();
+console.log('\n-----------------XO------------------\n');
+crossover(randomTree, randomTree2).display();
