@@ -2,6 +2,35 @@
 
 var core = require('./core');
 
+Object.prototype.clone = function () {
+    if (this.cloneNode) {
+        return this.cloneNode(true);
+    }
+    var copy = this instanceof Array ? [] : {};
+    for (var attr in this) {
+        if (typeof this[attr] == "function" || this[attr] == null || !this[attr].clone) {
+            copy[attr] = this[attr];
+        } else if (this[attr] == this) {
+            copy[attr] = copy;
+        } else {
+            copy[attr] = this[attr].clone();
+        }
+    }
+    return copy;
+};
+
+Date.prototype.clone = function () {
+    var copy = new Date();
+    copy.setTime(this.getTime());
+    return copy;
+};
+
+Number.prototype.clone =
+    Boolean.prototype.clone =
+        String.prototype.clone = function () {
+            return this;
+        };
+
 var addw = new core.FnWrapper({
         name:       'add',
         childCount: 2,
@@ -100,9 +129,71 @@ var addw = new core.FnWrapper({
         } else {
             return new core.ConstNode(core.random(0, 10));
         }
-    };
+    },
+
+    /**
+     * Mutates subtree with a small probability.
+     * @param t
+     * @param pc
+     * @param [probChange]
+     * @returns {*}
+     */
+    mutate = function (t, pc, probChange) {
+        probChange = probChange === undefined ? 0.1 : probChange;
+
+        if (Math.random() < probChange) {
+            return createRandomTree(pc);
+        } else {
+            var result = t.clone();
+            if (t instanceof  core.Node) {
+                result.children = t.children
+                    .map(function (child) {
+                        return mutate(child, pc, probChange);
+                    });
+            }
+            return result;
+        }
+    },
+
+    unknownFunction = function (x, y) {
+        return (Math.pow(x, 2) + (2 * y) + (3 * x) + 5);
+    },
+
+    buildUknownFunktionValues = function () {
+        return Array.apply(null, new Array(200))
+            .map(function () {
+                var x = core.random(0, 40),
+                    y = core.random(0, 40);
+
+                return [x, y, unknownFunction(x, y)];
+            });
+    },
+
+    randomSet = buildUknownFunktionValues(),
+
+    scoreFn = function (tree, s) {
+        var dif = 0;
+
+        s.forEach(function (data) {
+            var v = tree.evaluate([data[0], data[1]]);
+            dif += Math.abs(v - data[2]);
+        });
+
+        return dif;
+    },
+
+    randomTree = createRandomTree(2);
 
 //console.log(tree1.evaluate([5, 3]));
 //tree1.display();
 //createRandomTree(2).display();
-console.log(createRandomTree(2).toStr([5, 3]));
+
+console.log(randomTree.toStr([2, 5]));
+console.log(scoreFn(randomTree, randomSet));
+//randomTree.display();
+
+var mutated = mutate(randomTree, 2);
+
+console.log('-------------------------------------');
+console.log(scoreFn(randomTree, randomSet));
+console.log(scoreFn(mutated, randomSet));
