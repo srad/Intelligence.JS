@@ -8,6 +8,10 @@ var addw = new core.FnWrapper({
 
         fn: function (l) {
             return l[0] + l[1];
+        },
+
+        str: function (l) {
+            return '(' + l[0] + ' + ' + l[1] + ')';
         }
     }),
 
@@ -17,6 +21,10 @@ var addw = new core.FnWrapper({
 
         fn: function (l) {
             return l[0] - l[1];
+        },
+
+        str: function (l) {
+            return '(' + l[0] + ' - ' + l[1] + ')';
         }
     }),
 
@@ -26,6 +34,10 @@ var addw = new core.FnWrapper({
 
         fn: function (l) {
             return l[0] * l[1];
+        },
+
+        str: function (l) {
+            return '(' + l[0] + ' * ' + l[1] + ')';
         }
     }),
 
@@ -38,6 +50,10 @@ var addw = new core.FnWrapper({
                 return l[1];
             }
             return l[2];
+        },
+
+        str: function (l) {
+            return 'if (' + l[0] + ' > 0) { return ' + l[1] + ' } else { return ' + l[2] + ' }';
         }
     }),
 
@@ -47,6 +63,10 @@ var addw = new core.FnWrapper({
 
         fn: function (l) {
             return l[0] > l[1] ? 1 : 0;
+        },
+
+        str: function (l) {
+            return 'if (' + l[0] + ' > ' + l[1] + ') { return 1 } else { return 0 }';
         }
     }),
 
@@ -84,4 +104,5 @@ var addw = new core.FnWrapper({
 
 //console.log(tree1.evaluate([5, 3]));
 //tree1.display();
-createRandomTree(2, 10).display();
+//createRandomTree(2).display();
+console.log(createRandomTree(2).toStr([5, 3]));

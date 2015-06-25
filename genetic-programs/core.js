@@ -10,6 +10,7 @@ function FnWrapper(param) {
     this.fn = param.fn;
     this.childCount = param.childCount;
     this.name = param.name;
+    this.str = param.str;
 }
 
 /**
@@ -21,6 +22,7 @@ function FnWrapper(param) {
 function Node(param) {
     this.fn = param.fw.fn;
     this.name = param.fw.name;
+    this.str = param.fw.str;
     this.children = param.children;
 }
 
@@ -29,6 +31,13 @@ Node.prototype.evaluate = function (input) {
         return node.evaluate(input);
     });
     return this.fn(results);
+};
+
+Node.prototype.toStr = function (input) {
+    var results = this.children.map(function (node) {
+        return node.toStr(input);
+    });
+    return this.str(results);
 };
 
 Node.prototype.display = function (indent) {
@@ -52,6 +61,10 @@ ParamNode.prototype.display = function (indent) {
     console.log(new Array(indent || 0).join(' ') + 'p' + this.index);
 };
 
+ParamNode.prototype.toStr = function () {
+    return 'p' + this.index;
+};
+
 ParamNode.prototype.evaluate = function (input) {
     return input[this.index];
 };
@@ -70,6 +83,10 @@ ConstNode.prototype.evaluate = function (input) {
 
 ConstNode.prototype.display = function (indent) {
     console.log(new Array(indent || 0).join(' ') + this.v);
+};
+
+ConstNode.prototype.toStr = function () {
+    return this.v;
 };
 
 module.exports = {
