@@ -78,10 +78,10 @@ var addw = new core.FnWrapper({
         } else if (Math.random() < ppr) {
             return new core.ParamNode(core.random(0, pc - 1));
         } else {
-            return core.ConstNode(core.random(0, 10));
+            return new core.ConstNode(core.random(0, 10));
         }
     };
 
 //console.log(tree1.evaluate([5, 3]));
 //tree1.display();
-createRandomTree(2).display();
+createRandomTree(2, 10).display();
